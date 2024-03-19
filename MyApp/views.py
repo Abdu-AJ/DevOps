@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
 from .models import Complains
-from django.http import HttpResponse
+from django.http import HttpResponse,JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .models import Complains
-# Create your views here.
+import json
+import requests
+
 def index(request):
     return render(request,'index.html')
 @csrf_exempt
@@ -15,8 +16,15 @@ def NewTicket(request):
         comments = 'To be Updated'
         complain = Complains(email=email, phonenumber=phonenumber, complain=complain, comments=comments)
         complain.save()
+        # api_url = 'https://9w9hrve1k6.execute-api.us-east-1.amazonaws.com/PDFGen/health'
+        # response = requests.get(api_url)
+        # if response.status_code == 200:
+        #     return HttpResponse('API triggered successfully.', status=200)
+        # else:
+        #     return HttpResponse('Failed to trigger the API.', status=500)
         return redirect('index')
     return render(request,'NewTicket.html')
+    
 def Tracking(request):
     return render(request, 'Tracking.html')
     

@@ -1,7 +1,9 @@
 from django.db import models
 from django.utils import timezone
-# Create your models here.
+from django.db.models import Manager
+
 class Complains(models.Model):
+    objects: Manager = models.Manager()  # Explicitly declare the manager for type hinting
     email = models.CharField(max_length=200)
     phonenumber = models.CharField(max_length=200)
     complain = models.CharField(max_length=200)
