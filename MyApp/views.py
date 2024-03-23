@@ -16,12 +16,6 @@ def NewTicket(request):
         comments = 'To be Updated'
         complain = Complains(email=email, phonenumber=phonenumber, complain=complain, comments=comments)
         complain.save()
-        # api_url = 'https://9w9hrve1k6.execute-api.us-east-1.amazonaws.com/PDFGen/health'
-        # response = requests.get(api_url)
-        # if response.status_code == 200:
-        #     return HttpResponse('API triggered successfully.', status=200)
-        # else:
-        #     return HttpResponse('Failed to trigger the API.', status=500)
         return redirect('index')
     return render(request,'NewTicket.html')
     
