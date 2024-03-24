@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Complains
+from .models import Complains,Usage
 from django.http import HttpResponse,JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -26,3 +26,11 @@ def Result(request):
     phone_number = request.GET.get('PhoneNumber')
     complaints = Complains.objects.filter(phonenumber=phone_number) if phone_number else None
     return render(request, 'searchresult.html', {'complaints': complaints})
+    
+def User_Usage(request):
+    return render(request, 'Usage.html')
+    
+def Usage_results(request):
+    phone_number = request.GET.get('PhoneNumber')
+    user_usage = Usage.objects.filter(phonenumber=phone_number) if phone_number else None
+    return render(request, 'Usage_resutls.html', {'user_usage': user_usage})

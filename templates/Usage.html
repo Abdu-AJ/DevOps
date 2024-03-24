@@ -24,22 +24,17 @@
     </nav>
     <div class="container">
       <div class="p-5 mb-4 bg-light rounded-3">
-        <h1 class="display-4">Search Results:</h1>
+        <h1 class="display-4">Track Your Usage</h1>
+        <p class="lead">Enter your Number Please</p>
       </div>
-    {% if complaints %}
-        <ol>
-            {% for complaint in complaints %}
-                <li>Email: {{ complaint.email }}</li>
-                <li>Phone Number: {{ complaint.phonenumber }}</li>
-                <li>Complaint: {{ complaint.complain }}</li>
-                <li>Comments: {{ complaint.comments }}</li>
-                <li>Date: {{ complaint.date|date:"Y-m-d" }}</li>
-                <hr>
-            {% endfor %}
-        </ol>
-    {% else %}
-        <p>No complaints found for the provided phone number.</p>
-    {% endif %}
+    <form action="{% url 'Usage_results' %}" method="get">
+    <div class="mb-3">
+        <label for="PhoneNumber" class="form-label">Phone Number</label>
+        <input type="text" class="form-control" name="PhoneNumber" id="PhoneNumber" placeholder="Phone Number" required>
     </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+    </div>
+
   </body>
 </html>
