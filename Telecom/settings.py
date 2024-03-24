@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'members',
 ]
 AUTH_USER_MODEL = 'members.CustomUser'
+LOGIN_URL = '/members/login_user'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

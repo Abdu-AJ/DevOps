@@ -20,6 +20,20 @@
             </li>
           </ul>
         </div>
+      {% if user.is_authenticated %}
+            <ul class="navbar-nav">
+        <li class="nav-item ml-auto">
+        <span style="color: white;">Welcome {{ user.email }}</span>
+        <a class="nav-link active" href="{% url 'logout' %}"> | Logout</a>
+        </li>
+        </ul>
+      {% else %}
+      <ul class="navbar-nav">
+          <li class="nav-item ml-auto">
+          <a class="nav-link active" href="{% url 'register_user' %}">Register</a>
+        </li>
+      </ul>
+      {% endif %}
       </div>
     </nav>
     <div class="container">
