@@ -38,3 +38,9 @@ def Usage_results(request):
     phone_number = request.GET.get('PhoneNumber')
     user_usage = Usage.objects.filter(phonenumber=phone_number) if phone_number else None
     return render(request, 'Usage_resutls.html', {'user_usage': user_usage})
+    
+def Weekly_Usage(request):
+    return render(request, 'Weekly_Usage.html')
+
+def Weekly_Usage_results(request):
+    return render(request, 'Tracking.html')

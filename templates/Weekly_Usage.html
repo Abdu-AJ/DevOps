@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Best Network Ever</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">Welcome</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link active" href="{% url 'index' %}">Landing Page</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="container">
+      <div class="p-5 mb-4 bg-light rounded-3">
+        <h1 class="display-4">Check your weekly Data Usage</h1>
+        <p class="lead">Enter the dates you want to check from the last Month!</p>
+      </div>
+    <form id="dateForm" onsubmit="printDates(event)">
+    <div class="mb-3">
+          <input type="date" class="form-control" name="Start" placeholder="Start Date" style="width: 400px;height: 50px;" required>
+          <br />
+          <input type="date" class="form-control" name="End" placeholder="End Date" style="width: 400px;height: 50px;" required>
+          <br />
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+    </div>
+<script>
+function printDates(e) {
+  e.preventDefault();
+
+  var startDate = document.querySelector('input[name="Start"]').valueAsDate;
+  var endDate = document.querySelector('input[name="End"]').valueAsDate;
+
+  var timeDiff = endDate - startDate;
+  var dayDiff = timeDiff / (1000 * 3600 * 24);
+
+  if (dayDiff === 6) {
+    var printWindow = window.open('', '', 'height=400,width=800');
+    printWindow.document.write('<html><head><title>Print Dates</title>');
+    printWindow.document.write('</head><body>');
+    printWindow.document.write('<p>Selected Dates:</p>');
+    
+    for (var i = 0; i <= dayDiff; i++) {
+      var currentDate = new Date(startDate.getTime());
+      currentDate.setDate(startDate.getDate() + i);
+      var formattedDate = currentDate.toISOString().slice(0, 10); // Format the date as YYYY-MM-DD
+      printWindow.document.write('<p>' + formattedDate + '</p>');
+    }
+    
+    printWindow.document.write('</body></html>');
+    printWindow.document.close();
+    printWindow.onload = function() {
+      printWindow.print();
+      printWindow.close();
+    };
+  } else {
+    alert('Please select a range of exactly 7 days.');
+  }
+}
+
+
+</script>
+
+  </body>
+</html>
