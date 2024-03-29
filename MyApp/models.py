@@ -10,7 +10,7 @@ class Complains(models.Model):
     comments = models.CharField(max_length=200)
     date = models.DateField(auto_now_add=True)
 
-class Usage(models.Model):
+class Daily_Usage(models.Model):
     objects: Manager = models.Manager()
     phonenumber = models.CharField(max_length=200)
     LocalSMSPricing = models.DecimalField(max_digits=10, decimal_places=2)
@@ -20,3 +20,6 @@ class Usage(models.Model):
     InternationalCallPricing = models.DecimalField(max_digits=10, decimal_places=2)
     InternationalSMSPricing = models.DecimalField(max_digits=10, decimal_places=2)
     OnNetPricing = models.DecimalField(max_digits=10, decimal_places=2)
+    date = models.DateField()
+    class Meta:
+        unique_together = [['phonenumber', 'date']]
