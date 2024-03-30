@@ -5,7 +5,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from datetime import datetime, timedelta
 from django.db.models import Sum
-
 import json
 import requests
 
@@ -42,7 +41,6 @@ def Usage_results(request):
         thirty_days_ago = datetime.now() - timedelta(days=30)
         
         user_usage = Daily_Usage.objects.filter(phonenumber=phone_number, date__gte=thirty_days_ago)
-        
         total_local_sms = user_usage.aggregate(total_LocalSMSPricing=Sum('LocalSMSPricing'))['total_LocalSMSPricing']
         total_gprs = user_usage.aggregate(total_GPRSPricing=Sum('GPRSPricing'))['total_GPRSPricing']
         total_offnet_calls = user_usage.aggregate(total_OffNetPricing=Sum('OffNetPricing'))['total_OffNetPricing']
@@ -73,4 +71,47 @@ def Weekly_Usage(request):
     return render(request, 'Weekly_Usage.html')
 
 def Weekly_Usage_results(request):
-    return render(request, 'Tracking.html')
+    if request.method == 'POST':
+        phone_number = request.POST.get('user_number')
+        start_date = request.POST.get('Start')
+        end_date = request.POST.get('End')
+        
+        start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+        end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
+        
+        usage_records = Daily_Usage.objects.filter(date__range=[start_date, end_date], phonenumber=phone_number)
+        
+        data_to_send = {
+         "data": [
+            {"amount": int(round(float(record.GPRSPricing))), "date": record.date.strftime("%Y-%m-%d")}
+             for record in usage_records
+            ]
+            }
+        api_url = 'https://746x7jtblf.execute-api.us-east-1.amazonaws.com/dev/analyze'
+        
+        try:
+            response = requests.post(api_url, json=data_to_send)
+            response_data = response.json()
+            
+            if response.status_code == 200:
+                return render(request, 'Weekly_Usage_results.html', {'api_response': response_data, 'usage_records': usage_records})
+            else:
+                return HttpResponse(f"API call failed with status code {response.status_code}", status=500)
+        except requests.exceptions.RequestException as e:
+            return HttpResponse(f"API call error: {str(e)}", status=500)
+    else:
+        return render(request, 'Weekly_Usage_results.html')    
+    
+    
+    
+    # if request.method == 'POST':
+    #     phone_number = request.POST.get('user_number')
+    #     start_date = request.POST.get('Start')
+    #     end_date = request.POST.get('End')
+        
+    #     start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+    #     end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
+        
+    #     usage_records = Daily_Usage.objects.filter(date__range=[start_date, end_date], phonenumber=phone_number)
+    
+    # return render(request, 'Weekly_Usage_results.html', {'usage_records': usage_records})

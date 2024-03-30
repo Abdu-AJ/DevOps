@@ -27,52 +27,19 @@
         <h1 class="display-4">Check your weekly Data Usage</h1>
         <p class="lead">Enter the dates you want to check from the last Month!</p>
       </div>
-    <form id="dateForm" onsubmit="printDates(event)">
-    <div class="mb-3">
-          <input type="date" class="form-control" name="Start" placeholder="Start Date" style="width: 400px;height: 50px;" required>
-          <br />
-          <input type="date" class="form-control" name="End" placeholder="End Date" style="width: 400px;height: 50px;" required>
-          <br />
+<form id="dateForm" method="POST" action="{% url 'Weekly_Usage_results' %}">
+  {% csrf_token %}
+  <div class="mb-3">
+    <input type="date" class="form-control" name="Start" placeholder="Start Date" style="width: 400px;height: 50px;" required>
+    <br />
+    <input type="date" class="form-control" name="End" placeholder="End Date" style="width: 400px;height: 50px;" required>
+    <br />
+    <input type="hidden" name="user_number" value="{{ user.phone_number }}">
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
     </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
-  </form>
-    </div>
-<script>
-function printDates(e) {
-  e.preventDefault();
-
-  var startDate = document.querySelector('input[name="Start"]').valueAsDate;
-  var endDate = document.querySelector('input[name="End"]').valueAsDate;
-
-  var timeDiff = endDate - startDate;
-  var dayDiff = timeDiff / (1000 * 3600 * 24);
-
-  if (dayDiff === 6) {
-    var printWindow = window.open('', '', 'height=400,width=800');
-    printWindow.document.write('<html><head><title>Print Dates</title>');
-    printWindow.document.write('</head><body>');
-    printWindow.document.write('<p>Selected Dates:</p>');
-    
-    for (var i = 0; i <= dayDiff; i++) {
-      var currentDate = new Date(startDate.getTime());
-      currentDate.setDate(startDate.getDate() + i);
-      var formattedDate = currentDate.toISOString().slice(0, 10); // Format the date as YYYY-MM-DD
-      printWindow.document.write('<p>' + formattedDate + '</p>');
-    }
-    
-    printWindow.document.write('</body></html>');
-    printWindow.document.close();
-    printWindow.onload = function() {
-      printWindow.print();
-      printWindow.close();
-    };
-  } else {
-    alert('Please select a range of exactly 7 days.');
-  }
-}
-
-
-</script>
 
   </body>
 </html>

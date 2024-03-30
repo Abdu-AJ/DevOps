@@ -24,16 +24,21 @@
     </nav>
     <div class="container">
       <div class="p-5 mb-4 bg-light rounded-3">
-        <h1 class="display-4">Track Your Usage</h1>
-        <p class="lead">Enter your Number Please</p>
+        <h3 class="display-4">Your Selected Week Usage</h3>
       </div>
-    <form action="{% url 'Usage_results' %}" method="get">
-    <div class="mb-3">
-        <label for="PhoneNumber" class="form-label">Phone Number</label>
-        <input type="text" class="form-control" name="PhoneNumber" id="PhoneNumber" placeholder="Phone Number" required>
-    </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
-  </form>
+    <h1>Weekly Usage Results</h1>
+        {% for record in usage_records %}
+        <p>{{ record.date }}: {{ record.GPRSPricing }}</p>
+        {% endfor %}
+      <h1>Usage Summary</h1>  
+    {% if api_response %}
+        <p>Average: {{ api_response.average }}</p>
+        <p>Maximum: {{ api_response.maximum }}</p>
+        <p>Minimum: {{ api_response.minimum }}</p>
+        <p>Sum: {{ api_response.sum }}</p>
+    {% else %}
+        <p>No data available.</p>
+    {% endif %}
     </div>
 
   </body>
