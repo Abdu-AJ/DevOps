@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect
-from .models import Complains,Daily_Usage,Pricing
+from .models import Complains,Daily_Usage
 from django.http import HttpResponse,JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from datetime import datetime, timedelta
 from django.db.models import Sum
 import json,requests
+from MyApp.models import Pricing
 
 def index(request):
     return render(request,'index.html')
@@ -35,27 +36,16 @@ def User_Usage(request):
     return render(request, 'Usage.html')
     
 def Usage_results(request):
-    phone_number = request.GET.get('PhoneNumber')
-    if phone_number:
-        thirty_days_ago = datetime.now() - timedelta(days=30)
-        
-        user_usage = Daily_Usage.objects.filter(phonenumber=phone_number, date__gte=thirty_days_ago)
-        total_local_sms = user_usage.aggregate(total_LocalSMSPricing=Sum('LocalSMSPricing'))['total_LocalSMSPricing']
-        total_gprs = user_usage.aggregate(total_GPRSPricing=Sum('GPRSPricing'))['total_GPRSPricing']
-        total_offnet_calls = user_usage.aggregate(total_OffNetPricing=Sum('OffNetPricing'))['total_OffNetPricing']
-        total_onnet_calls = user_usage.aggregate(total_OnNetPricing=Sum('OnNetPricing'))['total_OnNetPricing']
-        total_irish_landline = user_usage.aggregate(total_IrishLandlinePricing=Sum('IrishLandlinePricing'))['total_IrishLandlinePricing']
-        total_international_call = user_usage.aggregate(total_InternationalCallPricing=Sum('InternationalCallPricing'))['total_InternationalCallPricing']
-        total_international_sms = user_usage.aggregate(total_InternationalSMSPricing=Sum('InternationalSMSPricing'))['total_InternationalSMSPricing']
-    else:
-        total_local_sms = None
-        total_gprs = None
-        total_offnet_calls = None
-        total_onnet_calls = None
-        total_irish_landline = None
-        total_international_call = None
-        total_international_sms = None
-    
+    phone_number = request.POST.get('PhoneNumber', request.GET.get('PhoneNumber'))
+    thirty_days_ago = datetime.now() - timedelta(days=30)
+    user_usage = Daily_Usage.objects.filter(phonenumber=phone_number, date__gte=thirty_days_ago)
+    total_local_sms = user_usage.aggregate(total_LocalSMSPricing=Sum('LocalSMSPricing'))['total_LocalSMSPricing']
+    total_gprs = user_usage.aggregate(total_GPRSPricing=Sum('GPRSPricing'))['total_GPRSPricing']
+    total_offnet_calls = user_usage.aggregate(total_OffNetPricing=Sum('OffNetPricing'))['total_OffNetPricing']
+    total_onnet_calls = user_usage.aggregate(total_OnNetPricing=Sum('OnNetPricing'))['total_OnNetPricing']
+    total_irish_landline = user_usage.aggregate(total_IrishLandlinePricing=Sum('IrishLandlinePricing'))['total_IrishLandlinePricing']
+    total_international_call = user_usage.aggregate(total_InternationalCallPricing=Sum('InternationalCallPricing'))['total_InternationalCallPricing']
+    total_international_sms = user_usage.aggregate(total_InternationalSMSPricing=Sum('InternationalSMSPricing'))['total_InternationalSMSPricing']
     user_usage={
         'Local SMS': total_local_sms,
         'GPRS': total_gprs,
@@ -64,8 +54,10 @@ def Usage_results(request):
         'Irish Landline Calls': total_irish_landline,
         'International Calls': total_international_call,
         'International SMSs': total_international_sms }
-    if request.method == 'POST':
-        pricing_instance = Pricing.objects.first()
+    pricing_instance = Pricing.objects.filter().first()
+    pricing_map = {}
+    api_trigger_data = []
+    if pricing_instance:
         pricing_map = {
     'Local SMS': pricing_instance.LocalSMSPricing,
     'GPRS': pricing_instance.GPRSPricing,
@@ -74,14 +66,20 @@ def Usage_results(request):
     'Irish Landline Calls': pricing_instance.IrishLandlinePricing,
     'International Calls': pricing_instance.InternationalCallPricing,
     'International SMSs': pricing_instance.InternationalSMSPricing,}
-    api_trigger_data = []
-    for item, amount in user_usage.items():
-        price = pricing_map[item]
-        api_trigger_data.append({
-        "item": item,
-        "amount": amount,
-        "price": float(price)
-    })
+    if request.method == 'POST':
+        emailid = request.POST.get('emailid')
+        for item, amount in user_usage.items():
+            price = pricing_map[item]
+            api_trigger_data.append({"item": item, "amount": str(amount), "price": str(price)})
+        payload = {
+        "emailid": emailid,
+        "data": api_trigger_data}
+        api_url = 'https://9w9hrve1k6.execute-api.us-east-1.amazonaws.com/PDFGen/products'
+        response = requests.post(api_url, json=payload)
+        if response.status_code == 200:
+            return render(request,'index.html')
+        else:
+            return render(request,'index.html')
     return render(request, 'Usage_resutls.html',{'user_usage': user_usage})
     
 def Weekly_Usage(request):
