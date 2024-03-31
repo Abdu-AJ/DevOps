@@ -1,7 +1,5 @@
 from django.contrib import admin
-from .models import Complains
-from .models import Daily_Usage
-
+from .models import Complains,Pricing,Daily_Usage
 # Register your models here.
 
 class ComplainsAdmin(admin.ModelAdmin):
@@ -9,3 +7,4 @@ class ComplainsAdmin(admin.ModelAdmin):
 
 admin.site.register(Complains, ComplainsAdmin)
 admin.site.register(Daily_Usage)
+admin.site.register(Pricing)

@@ -1,12 +1,11 @@
 from django.shortcuts import render, redirect
-from .models import Complains,Daily_Usage
+from .models import Complains,Daily_Usage,Pricing
 from django.http import HttpResponse,JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from datetime import datetime, timedelta
 from django.db.models import Sum
-import json
-import requests
+import json,requests
 
 def index(request):
     return render(request,'index.html')
@@ -65,6 +64,24 @@ def Usage_results(request):
         'Irish Landline Calls': total_irish_landline,
         'International Calls': total_international_call,
         'International SMSs': total_international_sms }
+    if request.method == 'POST':
+        pricing_instance = Pricing.objects.first()
+        pricing_map = {
+    'Local SMS': pricing_instance.LocalSMSPricing,
+    'GPRS': pricing_instance.GPRSPricing,
+    'Off Net Calls': pricing_instance.OffNetPricing,
+    'On Net Calls': pricing_instance.OnNetPricing,
+    'Irish Landline Calls': pricing_instance.IrishLandlinePricing,
+    'International Calls': pricing_instance.InternationalCallPricing,
+    'International SMSs': pricing_instance.InternationalSMSPricing,}
+    api_trigger_data = []
+    for item, amount in user_usage.items():
+        price = pricing_map[item]
+        api_trigger_data.append({
+        "item": item,
+        "amount": amount,
+        "price": float(price)
+    })
     return render(request, 'Usage_resutls.html',{'user_usage': user_usage})
     
 def Weekly_Usage(request):
@@ -84,9 +101,7 @@ def Weekly_Usage_results(request):
         data_to_send = {
          "data": [
             {"amount": int(round(float(record.GPRSPricing))), "date": record.date.strftime("%Y-%m-%d")}
-             for record in usage_records
-            ]
-            }
+             for record in usage_records] }
         api_url = 'https://746x7jtblf.execute-api.us-east-1.amazonaws.com/dev/analyze'
         
         try:
@@ -100,18 +115,4 @@ def Weekly_Usage_results(request):
         except requests.exceptions.RequestException as e:
             return HttpResponse(f"API call error: {str(e)}", status=500)
     else:
-        return render(request, 'Weekly_Usage_results.html')    
-    
-    
-    
-    # if request.method == 'POST':
-    #     phone_number = request.POST.get('user_number')
-    #     start_date = request.POST.get('Start')
-    #     end_date = request.POST.get('End')
-        
-    #     start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
-    #     end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
-        
-    #     usage_records = Daily_Usage.objects.filter(date__range=[start_date, end_date], phonenumber=phone_number)
-    
-    # return render(request, 'Weekly_Usage_results.html', {'usage_records': usage_records})
+        return render(request, 'Weekly_Usage_results.html')

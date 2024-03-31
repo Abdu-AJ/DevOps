@@ -39,11 +39,8 @@
 {% if user_usage %}
   <div class="container">
     <p>To generate a detailed bill for the last 30 days, please press confirm and You will receive an Email with all Details</p>
-    <form action="https://9w9hrve1k6.execute-api.us-east-1.amazonaws.com/PDFGen/product" method="get">
+    <form id="dateForm" method="POST" action="{% url 'Usage_results' %}">
       <input type="hidden" name="emailid" value="{{ user.email }}">
-      {% for service, value in user_usage.items %}
-        <input type="hidden" name="{{ service }}" value="{{ value }}">
-      {% endfor %}
       <button type="submit" class="btn btn-primary">Generate</button>
     </form>
   </div>

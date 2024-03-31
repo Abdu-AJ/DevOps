@@ -23,3 +23,11 @@ class Daily_Usage(models.Model):
     date = models.DateField()
     class Meta:
         unique_together = [['phonenumber', 'date']]
+class Pricing (models.Model):
+    LocalSMSPricing = models.DecimalField(max_digits=10, decimal_places=2)
+    GPRSPricing = models.DecimalField(max_digits=10, decimal_places=2)
+    OffNetPricing = models.DecimalField(max_digits=10, decimal_places=2)
+    IrishLandlinePricing = models.DecimalField(max_digits=10, decimal_places=2)
+    InternationalCallPricing = models.DecimalField(max_digits=10, decimal_places=2)
+    InternationalSMSPricing = models.DecimalField(max_digits=10, decimal_places=2)
+    OnNetPricing = models.DecimalField(max_digits=10, decimal_places=2)
